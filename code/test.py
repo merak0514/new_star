@@ -4,40 +4,13 @@
 # @Author   : Merak
 # @File     : test.py
 # @Software : PyCharm
-import cv2
-import numpy as np
-import csv
-train_image_path = './af2019-cv-training-20190312/'
-train_label_path = './af2019-cv-training-20190312/list.csv'
+from pre_processing import *
+train_image_path = '../af2019-cv-training-20190312/'
+train_label_path = '../af2019-cv-training-20190312/list.csv'
 a = '_a'
 b = '_b'
 c = '_c'
 end = '.jpg'
-
-
-def cut_too_small(image, lambda_=1.5):
-    aver = np.average(image)
-    image = (image > aver*lambda_) * image
-    return image
-
-
-def cut_too_large(image):
-    image_ = np.array((image < 150) * image, dtype=np.float32)
-    temp = np.array((image > 150) * 255, dtype=np.float32)
-    image_ += temp
-    return image_
-
-
-def middle_filter(image):
-    x_len = np.size(image, 0)
-    y_len = np.size(image, 1)
-    for i in range(x_len - 2):
-        for j in range(y_len - 2):
-            # if np.sum(image[i:i+3, j:j+3]) == image[i+1, j+1]:
-            #     image[i+1, j+1] = 0
-            image[i + 1, j + 1] = np.sort(np.hstack(image[i:i+3, j:j+3]))[4]
-
-    return image
 
 
 def get_pos_based_on_name(name):
@@ -71,7 +44,7 @@ if __name__ == '__main__':
     imc = middle_filter(imc).copy()
 
     ima_cut = imb - imc
-    ima_cut = (ima_cut > 0) * ima_cut
+    ima_cut *= (ima_cut > 0)  # 去掉小于0
     # cv2.imshow('ima_cut', ima_cut)
     x, y, label = get_pos_based_on_name(img_name)
     print('label', label)

@@ -5,8 +5,8 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
-train_image_path = './af2019-cv-training-20190312/'
-train_label_path = './af2019-cv-training-20190312/list.csv'
+train_image_path = '../af2019-cv-training-20190312/'
+train_label_path = '../af2019-cv-training-20190312/list.csv'
 index = 2458
 
 train_data = []
