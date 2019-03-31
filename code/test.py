@@ -4,7 +4,11 @@
 # @Author   : Merak
 # @File     : test.py
 # @Software : PyCharm
+import cv2
+import csv
+import numpy as np
 from pre_processing import *
+import matplotlib.pyplot as plt
 train_image_path = '../af2019-cv-training-20190312/'
 train_label_path = '../af2019-cv-training-20190312/list.csv'
 a = '_a'
@@ -26,33 +30,35 @@ def get_pos_based_on_name(name):
 
 
 if __name__ == '__main__':
-    img_name = '00b4b8a8152a05872297ec33fecac289'
+    img_name = '1f7ead8a98645c0f066857a42ea0f40e'
 
     imb = cv2.imread(''.join((train_image_path, img_name[:2], '/', img_name, b, end)))
-    imb = imb[:, :, 0]
+    imb = np.array(imb[:, :, 0], np.uint8)
     imc = cv2.imread(''.join((train_image_path, img_name[:2], '/', img_name, c, end)))
-    imc = imc[:, :, 0]
+    imc = np.array(imc[:, :, 0], np.uint8)
 
-    imb = cut_too_small(imb, lambda_=1.75)
+    imb = adjust_average(imb, imc).copy()
+
+    imb = cut_too_small(imb, lambda_=1.5)
     imb = cut_too_large(imb)
     # cv2.imshow('imb', imb)
-    imb = middle_filter(imb).copy()
+    imb = middle_filter(imb).copy()  # 有毒
     # cv2.imshow('imb2', imb)
 
     imc = cut_too_small(imc, lambda_=1.5)
     imc = cut_too_large(imc)
     imc = middle_filter(imc).copy()
 
-    ima_cut = imb - imc
-    ima_cut *= (ima_cut > 0)  # 去掉小于0
+    ima_cut = compute_diff(imb, imc)
+
     # cv2.imshow('ima_cut', ima_cut)
     x, y, label = get_pos_based_on_name(img_name)
     print('label', label)
-    img = cv2.circle(ima_cut, (x, y), 5, 255, 1)
+    img_a = cv2.circle(ima_cut, (x, y), 10, 255, 1)
     print(np.shape(imb))
-    img_b = cv2.circle(imb, (x, y), 5, 255, 1)
-    img_c = cv2.circle(imc, (x, y), 5, 255, 1)
-    cv2.imshow('img', img)
+    img_b = cv2.circle(imb, (x, y), 10, 255, 1)
+    img_c = cv2.circle(imc, (x, y), 10, 255, 1)
+    cv2.imshow('img_a', img_a)
     cv2.imshow('img_b', img_b)
     cv2.imshow('img_c', img_c)
     cv2.waitKey(0)

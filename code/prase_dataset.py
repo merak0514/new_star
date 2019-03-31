@@ -46,10 +46,10 @@ for data in train_data:
         img_path = os.path.join(train_image_path, '00', '00aed3c6b8f351e52ed5075603b56be1_a.jpg')
         print(img_path)
         img = cv2.imread(img_path)
-        # cv2.imshow('img', img)
+        # cv2.imshow('img_a', img_a)
 
         img = cv2.circle(img, (x, y), 5, (0, 255, 0), 1)
-        cv2.imshow('img', img)
+        cv2.imshow('img_a', img)
         cv2.waitKey(0)
 # image_file_list = os.listdir(train_image_path)
 # for idx in image_file_list:
@@ -59,12 +59,12 @@ for data in train_data:
 #         for image in image_list:
 #             if name in image:
 #                 image_path = os.path.join(image_file, image)
-#                 img = cv2.imread(image_path)
-#                 img_shape = np.shape(img)
+#                 img_a = cv2.imread(image_path)
+#                 img_shape = np.shape(img_a)
 #                 # if(img_shape not ):
-#                 # img = cv2.circle(img,(x,y),5,(0,255,0),1)
+#                 # img_a = cv2.circle(img_a,(x,y),5,(0,255,0),1)
 #                 # print(class_1)
-#                 # cv2.imshow('img',img)
+#                 # cv2.imshow('img_a',img_a)
 #                 # cv2.waitKey(0)
 #             # if(os.path.exists(image_path)):
 #             #     count +=1
