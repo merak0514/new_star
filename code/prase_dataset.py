@@ -12,7 +12,6 @@ index = 2458
 train_data = []
 with open(train_label_path) as csvfile:
     csv_reader = csv.reader(csvfile)
-    data_header = next(csv_reader)
     for row in csv_reader:
         train_data.append(row)
 print('The length of train_data is {}'.format(len(train_data)))

@@ -3,6 +3,10 @@
 import numpy as np
 import os
 import cv2
+import csv
+b = '_b'
+c = '_c'
+end = '.jpg'
 
 
 def compute_diff(image1, image2):
@@ -104,16 +108,60 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap)
     return images_1, images_2
 
 
-def save_image(image, name, location):
-    if not os.path.exists(location):
-        os.makedirs(location)
-    save_path = ''.join([location, '/', name, '.jpg'])
-    cv2.imwrite(save_path, image)
+def _process_and_cut_a_image(image_name, train_image_path='../af2019-cv-training-20190312/'):
+    """处理并切一张图片"""
+    img_b = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, b, end)))
+    img_b = np.array(img_b[:, :, 0], np.uint8)
+    img_c = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, c, end)))
+    img_c = np.array(img_c[:, :, 0], np.uint8)
+
+    img_b = adjust_average(img_b, img_c)
+    img_b = cut_too_small(img_b, lambda_=1.4)
+    img_b = cut_too_large(img_b)
+    img_b = middle_filter(img_b)
+    img_c = cut_too_small(img_c, lambda_=1.4)
+    img_c = cut_too_large(img_c)
+    img_c = middle_filter(img_c)
+
+    cut_images_b, cut_images_c = random_cut(img_b, img_c, (100, 100), 40, 10)
+    path = ''.join(['../cut_data/', image_name[:2]])
+    if not os.path.exists(path):
+        print(path)
+        os.makedirs(path)
+    for i in range(len(cut_images_b)):
+        image = cut_images_b[i]
+        im_path = ''.join([path, '/', image_name, str(i), b, end])
+        cv2.imwrite(im_path, image)
+    for i in range(len(cut_images_c)):
+        image = cut_images_c[i]
+        im_path = ''.join([path, '/', image_name, str(i), c, end])
+        cv2.imwrite(im_path, image)
+
+
+def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'):
+    """对文件夹中所有图片（不包括子文件夹中）做处理"""
+    if not os.path.exists(csv_path):
+        print('No file')
+        return -1
+
+    train_data = []
+    with open(csv_path) as csvfile:
+        csv_reader = csv.reader(csvfile)
+        for row in csv_reader:
+            train_data.append(row)
+    train_data = train_data[1:]  # 去掉第一行
+    print('The length of train_data is {}'.format(len(train_data)))
+
+    for datum in train_data:
+        print(datum)
+        image_name = datum[0]
+        _process_and_cut_a_image(image_name)
+
 
 
 if __name__ == '__main__':
 
-    # random_cut([[0,12,5,4,6],[8,2,5,6,5],[4,5,6,9,8],[5,6,63,7,8]], (1, 1), 2, 0)
-    a = np.array([[1, 3], [2, 4]])
-    b = np.array([[10, 20], [30, 40]])
-    print(adjust_average(a, b))
+    # 危险！
+    # process_and_cut_all_image()
+
+    pass
