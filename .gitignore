@@ -2,3 +2,5 @@ af2019*/
 *.zip
 .idea/
 pychache/
+cut_data/
+*.jpg
