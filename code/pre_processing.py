@@ -1,6 +1,8 @@
 # !/user/bin/env python
 # -*- coding: utf-8 -*-
 import numpy as np
+import os
+import cv2
 
 
 def compute_diff(image1, image2):
@@ -36,7 +38,7 @@ def middle_filter(image):
             #     image[i+1, j+1] = 0
             image[i + 1, j + 1] = np.sort(np.hstack(image[i:i + 3, j:j + 3]))[4]
 
-    return image
+    return image.copy()  # .copy有毒
 
 
 def adjust_average(image1, image2):
@@ -54,13 +56,64 @@ def adjust_average(image1, image2):
     av2 = np.sum(image2)/np.sum(image2 != 0)
     image1 = np.array(image1, np.float32)
     scale = av2 / av1
-    print(scale)
+    # print(scale)
     image1 *= scale
     image1 = np.array(np.rint(image1), np.uint8)
-    return image1
+    return image1.copy()
+
+
+def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap):
+    """
+    把两张图片同时切为指定大小的区块，每个区块在每张图中的位置相同
+    :type image_origin_1: np.array
+    :param size: (x, y) 切后的大小
+    :param choosing_length: 可供选择的区域长度，每个x的值都会在此区域中选择；但越大的选择空间意味着越少的图片
+    :param least_gap: 最小的间隔：两个选取点之间的x或y坐标的最小差值。
+    :return: images: [image]
+    """
+    image_origin_1 = np.array(image_origin_1, np.uint8)
+    x_len, y_len = np.shape(image_origin_1)
+    # x_len, y_len = (1000, 100)
+    if size[0] >= x_len or size[1] >= y_len:
+        print("too large size")
+        input("type any key to continue")
+        return -1
+    x_num = (x_len - size[0] + least_gap)//(choosing_length + least_gap)
+    y_num = (y_len - size[0] + least_gap)//(choosing_length + least_gap)
+    x_sections = [[i*choosing_length + i*least_gap, (i+1)*choosing_length + i*least_gap] for i in range(x_num)]
+    y_sections = [[i*choosing_length + i*least_gap, (i+1)*choosing_length + i*least_gap] for i in range(y_num)]
+    x_choices = [np.random.randint(j[0], j[1]) for j in x_sections]
+    y_choices = [np.random.randint(j[0], j[1]) for j in y_sections]
+
+    combines = []
+    for i in x_choices:
+        for j in y_choices:
+            combines.append((i, j))  # 相当于添加每个方框的开始坐标
+            # combines.append(((i, j), (i + size[0], j + size[1])))  # 添加每个方框的左上和右下坐标
+    # print(combines)
+
+    images_1 = []
+    for pos in combines:
+        image = image_origin_1[pos[0]: pos[0] + size[0], pos[1]: pos[1] + size[1]]
+        images_1.append(image)
+    images_2 = []
+    for pos in combines:
+        image = image_origin_2[pos[0]: pos[0] + size[0], pos[1]: pos[1] + size[1]]
+        images_2.append(image)
+
+    return images_1, images_2
+
+
+def save_image(image, name, location):
+    if not os.path.exists(location):
+        os.makedirs(location)
+    save_path = ''.join([location, '/', name, '.jpg'])
+    cv2.imwrite(save_path, image)
 
 
 if __name__ == '__main__':
+
+    # random_cut([[0,12,5,4,6],[8,2,5,6,5],[4,5,6,9,8],[5,6,63,7,8]], (1, 1), 2, 0)
     a = np.array([[1, 3], [2, 4]])
     b = np.array([[10, 20], [30, 40]])
     print(adjust_average(a, b))
