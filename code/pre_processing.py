@@ -95,7 +95,6 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     for i in x_choices:
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
-            print(i, j, origin_pos)
             if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
@@ -163,7 +162,11 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
     train_data = train_data[1:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
 
-    csv_file = open('../cut_data/labels.csv', 'a+', newline='')
+    if input('Print y to continue') is not 'y':
+        exit()
+
+    csv_file = open('../cut_data/labels.csv', 'a+')
+    # csv_file = open('../cut_data/labels.csv', 'a+', newline='')
     for datum in train_data:
         print(datum)
         image_name = datum[0]
@@ -177,6 +180,6 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险！
-    # process_and_cut_all_image()
+    process_and_cut_all_image()
 
     pass
