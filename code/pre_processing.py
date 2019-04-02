@@ -66,18 +66,19 @@ def adjust_average(image1, image2):
     return image1.copy()
 
 
-def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap):
+def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap, origin_pos):
     """
     把两张图片同时切为指定大小的区块，每个区块在每张图中的位置相同
     :type image_origin_1: np.array
     :param size: (x, y) 切后的大小
     :param choosing_length: 可供选择的区域长度，每个x的值都会在此区域中选择；但越大的选择空间意味着越少的图片
     :param least_gap: 最小的间隔：两个选取点之间的x或y坐标的最小差值。
-    :return: images: [image]
+    :param origin_pos: 初始标注的位置
+    :return: 两个list，分别为两张图切完之后的合集；
     """
     image_origin_1 = np.array(image_origin_1, np.uint8)
     x_len, y_len = np.shape(image_origin_1)
-    # x_len, y_len = (1000, 100)
+    # x_len, y_len = (1000, 100)  # 测试用
     if size[0] >= x_len or size[1] >= y_len:
         print("too large size")
         input("type any key to continue")
@@ -89,27 +90,33 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap)
     x_choices = [np.random.randint(j[0], j[1]) for j in x_sections]
     y_choices = [np.random.randint(j[0], j[1]) for j in y_sections]
 
-    combines = []
+    combines = []  # 所有开始切的坐标的合集
+    labels = []  # 和combines一一对应，为每一个坐标所对应图片中
     for i in x_choices:
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
-            # combines.append(((i, j), (i + size[0], j + size[1])))  # 添加每个方框的左上和右下坐标
+            print(i, j, origin_pos)
+            if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
+                labels.append((origin_pos[0]-i, origin_pos[1]-j))
+            else:
+                labels.append(0)
     # print(combines)
+    # print(labels)
 
     images_1 = []
-    for pos in combines:
-        image = image_origin_1[pos[0]: pos[0] + size[0], pos[1]: pos[1] + size[1]]
+    for position in combines:
+        image = image_origin_1[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
         images_1.append(image)
     images_2 = []
-    for pos in combines:
-        image = image_origin_2[pos[0]: pos[0] + size[0], pos[1]: pos[1] + size[1]]
+    for position in combines:
+        image = image_origin_2[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
         images_2.append(image)
 
-    return images_1, images_2
+    return images_1, images_2, labels
 
 
-def _process_and_cut_a_image(image_name, train_image_path='../af2019-cv-training-20190312/'):
-    """处理并切一张图片"""
+def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2019-cv-training-20190312/'):
+    """处理并切一张图片, pos为原图中标注的位置"""
     img_b = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, b, end)))
     img_b = np.array(img_b[:, :, 0], np.uint8)
     img_c = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, c, end)))
@@ -123,18 +130,22 @@ def _process_and_cut_a_image(image_name, train_image_path='../af2019-cv-training
     img_c = cut_too_large(img_c)
     img_c = middle_filter(img_c)
 
-    cut_images_b, cut_images_c = random_cut(img_b, img_c, (100, 100), 40, 10)
+    cut_images_b, cut_images_c, labels = random_cut(img_b, img_c, (100, 100), 40, 10, pos)
+
     path = ''.join(['../cut_data/', image_name[:2]])
     if not os.path.exists(path):
         print(path)
         os.makedirs(path)
     for i in range(len(cut_images_b)):
         image = cut_images_b[i]
-        im_path = ''.join([path, '/', image_name, str(i), b, end])
+        im_path = ''.join([path, '/', image_name, '_', str(i), b, end])
         cv2.imwrite(im_path, image)
+        data_row = [image_name+'_'+str(i), labels[i]]
+        csv.writer(csv_file).writerow(data_row)
+
     for i in range(len(cut_images_c)):
         image = cut_images_c[i]
-        im_path = ''.join([path, '/', image_name, str(i), c, end])
+        im_path = ''.join([path, '/', image_name,  '_', str(i), c, end])
         cv2.imwrite(im_path, image)
 
 
@@ -145,22 +156,26 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
         return -1
 
     train_data = []
-    with open(csv_path) as csvfile:
-        csv_reader = csv.reader(csvfile)
+    with open(csv_path) as csv_file:
+        csv_reader = csv.reader(csv_file)
         for row in csv_reader:
             train_data.append(row)
     train_data = train_data[1:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
 
+    csv_file = open('../cut_data/labels.csv', 'a+', newline='')
     for datum in train_data:
         print(datum)
         image_name = datum[0]
-        _process_and_cut_a_image(image_name)
+        pos = (int(datum[1]), int(datum[2]))
+        _process_and_cut_a_image(image_name, pos, csv_file)
+        # break
 
+    csv_file.close()
 
 
 if __name__ == '__main__':
-
+    # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险！
     # process_and_cut_all_image()
 
