@@ -81,7 +81,6 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     # x_len, y_len = (1000, 100)  # 测试用
     if size[0] >= x_len or size[1] >= y_len:
         print("too large size")
-        input("type any key to continue")
         return -1
     x_num = (x_len - size[0] + least_gap)//(choosing_length + least_gap)
     y_num = (y_len - size[0] + least_gap)//(choosing_length + least_gap)
@@ -95,7 +94,6 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     for i in x_choices:
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
-            print(i, j, origin_pos)
             if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
@@ -130,8 +128,11 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cut_too_large(img_c)
     img_c = middle_filter(img_c)
 
-    cut_images_b, cut_images_c, labels = random_cut(img_b, img_c, (100, 100), 40, 10, pos)
-
+    temp = random_cut(img_b, img_c, (100, 100), 40, 10, pos)
+    if temp == -1:
+        return
+    else:
+	cut_images_b, cut_images_c, labels = temp
     path = ''.join(['../cut_data/', image_name[:2]])
     if not os.path.exists(path):
         print(path)
@@ -149,7 +150,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
         cv2.imwrite(im_path, image)
 
 
-def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'):
+def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv', start=0):
     """对文件夹中所有图片（不包括子文件夹中）做处理"""
     if not os.path.exists(csv_path):
         print('No file')
@@ -160,10 +161,10 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
         csv_reader = csv.reader(csv_file)
         for row in csv_reader:
             train_data.append(row)
-    train_data = train_data[1:]  # 去掉第一行
+    train_data = train_data[1+start:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
 
-    csv_file = open('../cut_data/labels.csv', 'a+', newline='')
+    csv_file = open('../cut_data/labels.csv', 'a+')
     for datum in train_data:
         print(datum)
         image_name = datum[0]
@@ -176,7 +177,7 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
-    # 危险！
-    # process_and_cut_all_image()
+    # 危险!
+    process_and_cut_all_image(start=2060)
 
     pass
