@@ -81,8 +81,9 @@ def save_img(path, filename, img, text):
     """
     保存图片，文件名命名格式：地址 + 文件名 + 修改方式 + 后缀
     """
-    save_path = path+'\\' + \
-        os.path.splitext(filename)[0]+text+os.path.splitext(filename)[1]
+    path = path + '/' + filename[0:2] + '/'
+    save_path = path + \
+        os.path.splitext(filename)[0] + text + os.path.splitext(filename)[1]
     if not os.path.exists(path):
         os.makedirs(path)
     cv2.imwrite(save_path, img)  # change this with manipulation!!
@@ -101,8 +102,8 @@ def flip_img_hori(img, x, y, num, seed=0, israndom=False):
     x1 = max_rows - x
     y1 = y
     img1, x2, y2 = crop_img(img1, x1, y1, num, seed, israndom)  # 剪
-    return img1, x2, y2 
- 
+    return img1, x2, y2
+
 
 def flip_img_verti(img, x, y, num, seed=0, israndom=False):
     """
@@ -187,7 +188,7 @@ def crop_and_save(path, info, img_list, img_path, nums):
     :param nums: 图片的大小（这个变量应该改成size的）
     """
     x, y, label = int(info[1]), int(info[2]), info[3]
-    seed = random.randint(0, 100)  
+    seed = random.randint(0, 100)
     # 随机数种子。需要使abc三张图片裁剪方式相同，采取改变种子的方式实现
 
     for i in range(3):  # i=0 时为图片a
