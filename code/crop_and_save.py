@@ -15,7 +15,7 @@ def import_data(image_path, label_path):
     """
 
     train_data = []
-    with open(train_label_path) as csvfile:
+    with open(label_path) as csvfile:
         csv_reader = csv.reader(csvfile)
         # data_header = next(csv_reader)
 
