@@ -141,7 +141,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
 <<<<<<< HEAD
 	cut_images_b, cut_images_c, labels = temp
 =======
-        cut_images_b, cut_images_c, labels = temp
+	cut_images_b, cut_images_c, labels = temp
 
 >>>>>>> 8d86901525f09982e773dfb9e1893f2a08045238
     path = ''.join(['../cut_data/', image_name[:2]])
