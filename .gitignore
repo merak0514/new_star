@@ -1,5 +1,5 @@
 *.zip
 .idea/
-pychache/
 cut_data/
 *.jpg
+__pycache__/

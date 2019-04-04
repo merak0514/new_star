@@ -66,7 +66,7 @@ def adjust_average(image1, image2):
     return image1.copy()
 
 
-def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap, origin_pos):
+def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap, origin_pos, ignore_anomaly=True):
     """
     把两张图片同时切为指定大小的区块，每个区块在每张图中的位置相同
     :type image_origin_1: np.array
@@ -74,6 +74,7 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     :param choosing_length: 可供选择的区域长度，每个x的值都会在此区域中选择；但越大的选择空间意味着越少的图片
     :param least_gap: 最小的间隔：两个选取点之间的x或y坐标的最小差值。
     :param origin_pos: 初始标注的位置
+    :param ignore_anomaly: 忽略异常
     :return: 两个list，分别为两张图切完之后的合集；
     """
     image_origin_1 = np.array(image_origin_1, np.uint8)
@@ -81,6 +82,11 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     # x_len, y_len = (1000, 100)  # 测试用
     if size[0] >= x_len or size[1] >= y_len:
         print("too large size")
+<<<<<<< HEAD
+=======
+        if not ignore_anomaly:
+            input("type any key to continue")
+>>>>>>> 8d86901525f09982e773dfb9e1893f2a08045238
         return -1
     x_num = (x_len - size[0] + least_gap)//(choosing_length + least_gap)
     y_num = (y_len - size[0] + least_gap)//(choosing_length + least_gap)
@@ -132,7 +138,12 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     if temp == -1:
         return
     else:
+<<<<<<< HEAD
 	cut_images_b, cut_images_c, labels = temp
+=======
+        cut_images_b, cut_images_c, labels = temp
+
+>>>>>>> 8d86901525f09982e773dfb9e1893f2a08045238
     path = ''.join(['../cut_data/', image_name[:2]])
     if not os.path.exists(path):
         print(path)
@@ -164,7 +175,15 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
     train_data = train_data[1+start:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
 
+<<<<<<< HEAD
     csv_file = open('../cut_data/labels.csv', 'a+')
+=======
+    if input('Print y to continue') is not 'y':
+        exit()
+
+    csv_file = open('../cut_data/labels.csv', 'a+')
+    # csv_file = open('../cut_data/labels.csv', 'a+', newline='')
+>>>>>>> 8d86901525f09982e773dfb9e1893f2a08045238
     for datum in train_data:
         print(datum)
         image_name = datum[0]
@@ -177,7 +196,12 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
+<<<<<<< HEAD
     # 危险!
     process_and_cut_all_image(start=2060)
+=======
+    # 危险！
+    process_and_cut_all_image()
+>>>>>>> 8d86901525f09982e773dfb9e1893f2a08045238
 
     pass

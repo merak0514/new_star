@@ -26,3 +26,4 @@
 ### 裁剪图像：注意，打开pre_process注释部分
 
 裁剪图像的标注问题：标注在一个labels.csv的文件里面，第一列是名字，第二列如果是0则图内无星星；是坐标则是图中的相对坐标
+**重要：服务器上要用python2，python3 没有numpy，用python2的时候需要删掉 `pre_processing`里面第165行的new_line，因为py2还没有这个参数; 我注释了已经**
