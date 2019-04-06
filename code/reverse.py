@@ -132,7 +132,7 @@ if __name__ == "__main__":
                 # cv2.imshow('img2', img)
                 # cv2.waitKey(0)
                 text = '_origin'
-                save_img(save_path, img_name, img, text, x, y)
+                save_img(save_path, img_full_name, img, text, x, y)
 
                 text = '_flip_hori'
                 img1, x1, y1 = flip_img_hori(img, x, y)
