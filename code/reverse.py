@@ -33,7 +33,7 @@ def save_img(path, filename, img, text, x1, y1):
             f.write('')
 
     with open(txt_path, 'a') as f:
-        text_w = filename + text + '\t' + str(x1) + '\t' + str(y1) + '\t' + '1' + '\n'
+        text_w = os.path.splitext(filename)[0] + text + '\t' + str(x1) + '\t' + str(y1) + '\t' + '1' + '\n'
         f.write(text_w)
 
     print('Saved:\t' + filename + text)
