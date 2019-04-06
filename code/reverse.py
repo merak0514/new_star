@@ -1,3 +1,5 @@
+# !/user/bin/env python
+# -*- coding: utf-8 -*-
 import csv
 import os
 import cv2
@@ -27,7 +29,7 @@ def save_img(path, filename, img, text, x1, y1):
     
     print(txt_path)
     if not os.path.exists(txt_path):
-        with open(txt_path, 'w', newline='\n') as f:
+        with open(txt_path, 'w' ) as f:
             f.write('')
 
     with open(txt_path, 'a') as f:
@@ -134,23 +136,23 @@ if __name__ == "__main__":
 
                 text = '_flip_hori'
                 img1, x1, y1 = flip_img_hori(img, x, y)
-                save_img(save_path, img_name, img1, text, x1, y1)
+                save_img(save_path, img_full_name, img1, text, x1, y1)
 
                 text = '_flip_verti'
                 img2, x1, y1 = flip_img_verti(img, x, y)
-                save_img(save_path, img_name, img2, text, x1, y1)
+                save_img(save_path, img_full_name, img2, text, x1, y1)
 
                 text = '_flip_rotate_90'
                 img2, x1, y1 = rotate_img(img2, x1, y1, 90)
-                save_img(save_path, img_name, img2, text, x1, y1)
+                save_img(save_path, img_full_name, img2, text, x1, y1)
 
                 text = '_flip_rotate_270'
                 img2, x1, y1 = rotate_img(img2, x1, y1, 180)
-                save_img(save_path, img_name, img2, text, x1, y1)
+                save_img(save_path, img_full_name, img2, text, x1, y1)
 
                 text = '_rotate_90'
                 img3, x1, y1 = rotate_img(img, x, y, 90)
-                save_img(save_path, img_name, img3, text, x1, y1)
+                save_img(save_path, img_full_name, img3, text, x1, y1)
 
                 # img3 = cv2.circle(img3, (x1, y1), 5, (0, 255, 0), 1)
                 # cv2.imshow('img3', img3)
@@ -158,14 +160,13 @@ if __name__ == "__main__":
 
                 text = '_rotate_180'
                 img3, x1, y1 = rotate_img(img3, x1, y1, 90)
-                save_img(save_path, img_name, img3, text, x1, y1)
+                save_img(save_path, img_full_name, img3, text, x1, y1)
 
                 text = '_rotate_270'
                 img3, x1, y1 = rotate_img(img3, x1, y1, 180)
-                save_img(save_path, img_name, img3, text, x1, y1)
+                save_img(save_path, img_full_name, img3, text, x1, y1)
 
         # img3 = cv2.circle(img3, (x1, y1), 5, (0, 255, 0), 1)
         # cv2.imshow('img3', img3)
-        # cv2.waitKey(0)
-
+        # cv2.waitKey(
     print("All Done !!")

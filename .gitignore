@@ -3,4 +3,4 @@
 cut_data/
 *.jpg
 __pycache__/
-good_data/
+*.pyc
