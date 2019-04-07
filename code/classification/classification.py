@@ -52,18 +52,25 @@ if __name__ == '__main__':
         resnet18.train()
         for batch_count in range(len(train_data) // BATCH_SIZE):
             data = train_data[batch_count*BATCH_SIZE: (batch_count+1)*BATCH_SIZE]
-            images = []
-            labels = []
+            images = torch.Tensor([])  # b,w,h,c
+            labels = torch.Tensor([])
             for datum in data:
                 image_name = datum[0]
                 # print(datum)
                 label = int(datum[3])
 
-                image_b = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, b, end])))
-                image_c = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, c, end])))
+                # image_b = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, b, end])))
+                # image_c = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, c, end])))
+                image_b = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_b.jpg')[:, :, 0])
+                image_c = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_c.jpg')[:, :, 0])
+
                 image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
-                images.append(image_combine)
-                labels.append(label)
+                print(image_combine.unsqueeze(0).shape)
+                images = torch.cat((images, image_combine.unsqueeze(0)),0)
+                print(images.shape)
+                labels = torch.cat((labels, torch.Tensor(label)))
+            images = images.permute((0, 3, 1, 2))
+            print(images.shape)
 
             optimizer.zero_grad()
 
