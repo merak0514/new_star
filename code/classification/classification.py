@@ -38,12 +38,12 @@ train_data = np.array(train_data)
 #     print(i)
 #     assert 0
 classes = (0, 1)
-criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵，多用于多分类问题
+criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
 optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                       weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
 
 if __name__ == '__main__':
-    print(resnet18)
+    # print(resnet18)
     print('start training!')
     epoch_count = 0
     np.random.shuffle(train_data)
@@ -53,8 +53,8 @@ if __name__ == '__main__':
         for batch_count in range(len(train_data) // BATCH_SIZE):
             data = train_data[batch_count*BATCH_SIZE: (batch_count+1)*BATCH_SIZE]
             images = torch.Tensor([])  # b,w,h,c
-            labels = torch.Tensor([])
-            for datum in data:
+            labels = torch.zeros(BATCH_SIZE, dtype=torch.long)
+            for i, datum in enumerate(data, 0):
                 image_name = datum[0]
                 # print(datum)
                 label = int(datum[3])
@@ -65,17 +65,23 @@ if __name__ == '__main__':
                 image_c = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_c.jpg')[:, :, 0])
 
                 image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
-                print(image_combine.unsqueeze(0).shape)
                 images = torch.cat((images, image_combine.unsqueeze(0)),0)
-                print(images.shape)
-                labels = torch.cat((labels, torch.Tensor(label)))
+                labels[i] = label
+
+                # print('labels', labels)
             images = images.permute((0, 3, 1, 2))
-            print(images.shape)
+            print('image shape', images.shape)
 
             optimizer.zero_grad()
 
-            outputs = resnet18(images)
+            outputs = resnet18.forward(images)
+            # outputs = outputs[0, :]
+            # print('outputs shape', outputs.shape)
+            # print('labels shape', labels.shape)
+            # print(labels[2].type())
+            # outputs = outputs[:, 1] > outputs[:, 0]
+            # print(outputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            print(loss.item())
+            print(''.join(['epoch ', epoch, 'iter', batch_count, 'loss', loss.item()]))
