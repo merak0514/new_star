@@ -25,7 +25,7 @@ EPOCH = 1
 SAVE_ITER = 50
 train_set_label_path = '../new_labels.csv'
 train_set_path = '../../cut_data/'
-save_path = './'
+save_path = './model/'
 data = []
 with open(train_set_label_path) as f:
     csv_reader = csv.reader(f)
