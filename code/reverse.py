@@ -8,11 +8,19 @@ import math
 
 def save_img(path, filename, img, text, x1, y1):
     """
-    保存图片，文件名命名格式：地址 + 文件名 + 修改方式 + 后缀
+
+    :param path: 文件路径
+    :param filename: 文件名
+    :param img:
+    :param text:
+    :param x1:
+    :param y1:
+    :return:
     """
+
     if not os.path.exists(path + 'label' + '/'):
         os.makedirs(path + 'label' + '/')
-    txt_path = path + 'label' + '/' + filename[:32] + '.txt'
+    txt_path = path + 'label' + '/' + filename[:-6] + text + '.txt'
 
     if '_b' in filename:
         path = path + 'image_b'
@@ -23,17 +31,13 @@ def save_img(path, filename, img, text, x1, y1):
 
     if not os.path.exists(path):
         os.makedirs(path)
-        
-    save_path = path + '/' +os.path.splitext(filename)[0]+text+'.png'
+    filename_ = filename[:-6]
+    save_path = path + '/' + filename_ + text + '.png'
     cv2.imwrite(save_path, img)  # change this with manipulation!!
     
     print(txt_path)
-    if not os.path.exists(txt_path):
-        with open(txt_path, 'w' ) as f:
-            f.write('')
-
-    with open(txt_path, 'a') as f:
-        text_w = filename + text + '\t' + str(x1) + '\t' + str(y1) + '\t' + '1' + '\n'
+    with open(txt_path, 'w') as f:
+        text_w = filename_ + text + ' ' + str(x1) + ' ' + str(y1) + ' ' + '1' + '\n'
         f.write(text_w)
 
     print('Saved:\t' + filename + text)
@@ -116,7 +120,7 @@ if __name__ == "__main__":
     save_path = '../good_data/'
 
     train_data = import_data(train_label_path)
-    print(train_data)
+    print("导出数据:\t",train_data)
 
     for row in train_data:
         img_name, x, y, label = row[0], int(row[1]), int(row[2]), row[3]
@@ -131,6 +135,8 @@ if __name__ == "__main__":
                 # img = cv2.circle(img, (x, y), 5, (0, 255, 0), 1)
                 # cv2.imshow('img2', img)
                 # cv2.waitKey(0)
+                text = '_origin'
+                save_img(save_path, img_full_name, img, text, x, y)
 
                 text = '_flip_hori'
                 img1, x1, y1 = flip_img_hori(img, x, y)
