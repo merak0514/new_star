@@ -46,6 +46,11 @@ classes = (0, 1)
 criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
 optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                       weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
+state_dict_path = input('type the path of state_dict, or nothing to retrain the net')
+if state_dict_path:
+    model = torch.load(state_dict_path)
+    optimizer.load_state_dict(model['optimizer_state_dict'])
+    resnet18.load_state_dict(model['model_state_dict'])
 
 if __name__ == '__main__':
     # print(resnet18)
@@ -104,7 +109,8 @@ if __name__ == '__main__':
                 torch.save({
                     'epoch': epoch,
                     'batch': batch_count,
-                    'state_dict': optimizer.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'model_state_diict': resnet18.state_dict(),
                     'accuracy': correct_sum/((batch_count%SAVE_ITER + 1)*BATCH_SIZE),
 
                 }, ''.join([save_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
