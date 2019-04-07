@@ -84,4 +84,4 @@ if __name__ == '__main__':
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            print(''.join(['epoch ', epoch, 'iter', batch_count, 'loss', loss.item()]))
+            print(''.join(['epoch ', str(epoch), 'iter', str(batch_count), 'loss', str(loss.item())]))
