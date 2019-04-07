@@ -23,13 +23,14 @@ def import_data(index, label_path):
             train_data.append(row)
 
     info = train_data[index]
-
+    if not os.path.exists('../cut_data'):
+        os.makedirs('../cut_data')
     # 创建写入的文件
-    if not os.path.exists('list.csv'):
+    if not os.path.exists('new_labels.csv'):
         with open('new_labels.csv', 'w', newline='') as csvfile:  # 为write_data 做准备
             csv_writer = csv.writer(csvfile)
             csv_writer = csv_writer.writerow(
-                ["index", "filename", "x", "y", "label"])
+                ["filename", "x", "y", "label"])
 
     return train_data, info
 
@@ -38,8 +39,8 @@ def write_data(path, index, filename, text, x, y, label):
     """
     写入csv文件
     """
-    string = os.path.splitext(filename)[0]+text
-    write_list = [index, string, x, y, label]
+    string = os.path.splitext(filename)[0]
+    write_list = [string, x, y, label]
     with open('../cut_data/new_labels.csv', 'a+', newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer = csv_writer.writerow(write_list)
@@ -83,7 +84,7 @@ def save_img(path, filename, img, text):
     """
     path = path + '/' + filename[0:2] + '/'
     save_path = path + \
-        os.path.splitext(filename)[0] + text + os.path.splitext(filename)[1]
+        os.path.splitext(filename)[0] + os.path.splitext(filename)[1]
     if not os.path.exists(path):
         os.makedirs(path)
     cv2.imwrite(save_path, img)  # change this with manipulation!!
