@@ -72,8 +72,10 @@ if __name__ == '__main__':
                 # print(datum)
                 label = int(datum[3])
 
-                image_b = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, b, end])))
-                image_c = torch.Tensor(cv2.imread(''.join([train_set_path, image_name[:2], '/', image_name, c, end])))
+                image_b = torch.Tensor(cv2.imread
+                                       (''.join([train_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+                image_c = torch.Tensor(cv2.imread
+                                       (''.join([train_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
                 # image_b = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_b.jpg')[:, :, 0])
                 # image_c = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_c.jpg')[:, :, 0])
 
