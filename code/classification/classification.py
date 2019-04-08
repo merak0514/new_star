@@ -77,7 +77,7 @@ if __name__ == '__main__':
         bad_data_counter = 0
         good_data_counter = 0
         while True:
-            labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE))
+            labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE)).type(torch.LongTensor)
             images = torch.Tensor([])
             for ty in labels:
                 if ty == 0:
@@ -90,6 +90,9 @@ if __name__ == '__main__':
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     bad_data_counter += 1
+                    if bad_data_counter >= len(bad_data):
+                        bad_data_counter = 0
+                        break
                 elif ty == 1:
                     image_name = good_data[good_data_counter]
                     image_b = torch.Tensor(
@@ -100,6 +103,9 @@ if __name__ == '__main__':
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     good_data_counter += 1
+                    if good_data_counter >= len(good_data):
+                        good_data_counter = 0
+                        break
                 else:
                     input('wrong')
             images = images.permute((0, 3, 1, 2))
