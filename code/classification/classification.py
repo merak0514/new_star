@@ -17,6 +17,7 @@ import os
 b = '_b'
 c = '_c'
 end = '.jpg'
+end2 = '.png'
 LR = 0.02
 resnet18 = resnet.resnet18()
 resnet18.train()
@@ -30,7 +31,7 @@ train_data_set_path = '../../cut_data/'
 good_train_data_set_path = '../../good_data/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
-save_path = './model/'
+save_path = './model2/'
 bad_data = []
 with open(train_set_label_path) as f:
     csv_reader = csv.reader(f)
@@ -57,7 +58,7 @@ optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                       weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
 state_dict_path = input('type the path of state_dict, or nothing to retrain the net')
 if state_dict_path:
-    model = torch.load(state_dict_path)
+    model = torch.load(save_path+state_dict_path)
     optimizer.load_state_dict(model['optimizer_state_dict'])
     resnet18.load_state_dict(model['model_state_dict'])
 
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     epoch_count = 0
     np.random.shuffle(bad_train_data)
     np.random.shuffle(good_train_data)
-    epoch = 0
+    epoch = 0 
     while True:
         print('epoch:', epoch)
         resnet18.train()
@@ -92,9 +93,9 @@ if __name__ == '__main__':
                 elif ty == 1:
                     image_name = good_data[good_data_counter]
                     image_b = torch.Tensor(
-                        cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, b, end])))[:, :, 0]
+                        cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, end2])))[:, :, 0]
                     image_c = torch.Tensor(
-                        cv2.imread(''.join([good_train_data_set_path, IMAGE_C, image_name, c, end])))[:, :, 0]
+                        cv2.imread(''.join([good_train_data_set_path, IMAGE_C, image_name, end2])))[:, :, 0]
 
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
