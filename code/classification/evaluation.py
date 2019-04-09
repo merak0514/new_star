@@ -37,7 +37,7 @@ def find_newest_model(name=None):
     for model_name_ in models:
         max_epoch = max(int(re.findall('epoch_([0-9]+)', model_name_)[0]), max_epoch)
     for model_name_ in models:
-        if int(re.findall('epoch_([0-9]+)', model)[0]) == max_epoch:
+        if int(re.findall('epoch_([0-9]+)', model_name_)[0]) == max_epoch:
             max_batch = max(int(re.findall('batch_([0-9]+)', model_name_)[0]), max_epoch)
             current_choice = model_name_
 
