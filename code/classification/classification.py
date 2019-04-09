@@ -18,7 +18,7 @@ b = '_b'
 c = '_c'
 end = '.jpg'
 end2 = '.png'
-LR = 0.02
+LR = 0.01
 resnet18 = resnet.resnet18()
 resnet18.train()
 
@@ -78,21 +78,23 @@ if __name__ == '__main__':
     print('start training!')
     bad_train_data, _ = import_bad_data()
     good_train_data, _ = import_good_data()
-    np.random.shuffle(bad_train_data)
-    np.random.shuffle(good_train_data)
-    epoch = 0 
-    while True:
+    epoch = 0
+    resnet18.train()
+    while True:  # 循环：一个一个epoch训练
         print('epoch:', epoch)
-        resnet18.train()
+        np.random.shuffle(bad_train_data)  # 每过一个epoch：洗牌
+        np.random.shuffle(good_train_data)
         correct_sum = 0
         batch_count = 0
         bad_data_counter = 0
         good_data_counter = 0
-        while True:
+        while True:  # 循环：一个一个batch训练
+            # 构建一个0/1随机分布（不一定数量相等，但数学期望上数量相等）的label list
             labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE)).type(torch.LongTensor)
+
             images = torch.Tensor([])
-            for ty in labels:
-                if ty == 0:
+            for ty in labels:  # 按照构建的label list 挑选正负样本
+                if ty == 0:  # 负样本
                     image_name = bad_data[bad_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
@@ -105,7 +107,7 @@ if __name__ == '__main__':
                     if bad_data_counter >= len(bad_data):
                         bad_data_counter = 0
                         break
-                elif ty == 1:
+                elif ty == 1:  # 正样本
                     image_name = good_data[good_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, end2])))[:, :, 0]
@@ -120,15 +122,14 @@ if __name__ == '__main__':
                         break
                 else:
                     input('wrong')
-            images = images.permute((0, 3, 1, 2))
+            images = images.permute((0, 3, 1, 2))  # 换为b, c, w, h
 
-            batch_count += 1
             optimizer.zero_grad()
-
             outputs = resnet18.forward(images)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
+            batch_count += 1
 
             predict = (outputs[:, 1] > outputs[:, 0]).type(torch.LongTensor)
             correct_sum += sum((predict == labels).type(torch.FloatTensor))
