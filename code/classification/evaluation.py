@@ -77,7 +77,7 @@ if __name__ == '__main__':
     print(''.join(['Have tested ', str(TEST_SIZE), ' good pictures, accuracy = ', str(accuracy)]))
         
     print('testing bad data')
-    bad_labels = torch.ones(TEST_SIZE).type(torch.LongTensor)
+    bad_labels = torch.zeros(TEST_SIZE).type(torch.LongTensor)
     bad_images = torch.Tensor([])
     for i in range(TEST_SIZE):
         image_name = bad_test_data[i]
