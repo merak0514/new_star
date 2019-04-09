@@ -31,26 +31,37 @@ train_data_set_path = '../../cut_data/'
 good_train_data_set_path = '../../good_data/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
-save_path = './model2/'
-bad_data = []
-with open(train_set_label_path) as f:
-    csv_reader = csv.reader(f)
-    for row in csv_reader:
-        if int(row[3]) == 0:
-            bad_data.append(row[0])
-bad_data = np.array(bad_data)
-print(len(bad_data))
-bad_train_data = bad_data[: int(0.7 * len(bad_data))]
-bad_test_data = bad_data[int(0.7 * len(bad_data)):]
-print('train_data', len(bad_train_data))
+model_path = './model2/'
 
-good_data = []
-all_good_txt = os.listdir(good_train_set_label_path)
-for txt in all_good_txt:
-    good_data.append(txt[: -4])
-good_data = np.array(good_data)
-good_train_data = good_data[: int(0.7 * len(good_data))]
-good_test_data = good_data[int(0.7 * len(good_data)):]
+
+def import_bad_data():
+    bad_data = []
+    with open(train_set_label_path) as f:
+        csv_reader = csv.reader(f)
+        for row in csv_reader:
+            if int(row[3]) == 0:
+                bad_data.append(row[0])
+    bad_data = np.array(bad_data)
+    print(len(bad_data))
+    bad_train_data_ = bad_data[: int(0.7 * len(bad_data))]
+    bad_test_data = bad_data[int(0.7 * len(bad_data)):]
+    print('bad_train_data', len(bad_train_data_))
+    print('bad_test_data', len(bad_test_data))
+    return bad_train_data_, bad_test_data
+
+
+def import_good_data():
+    good_data = []
+    all_good_txt = os.listdir(good_train_set_label_path)
+    for txt in all_good_txt:
+        good_data.append(txt[: -4])
+    good_data = np.array(good_data)
+    good_train_data_ = good_data[: int(0.7 * len(good_data))]
+    good_test_data = good_data[int(0.7 * len(good_data)):]
+    print('good_train_data', len(good_train_data_))
+    print('good_test_data', len(good_test_data))
+    return good_train_data_, good_test_data
+
 
 classes = (0, 1)
 criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
@@ -58,14 +69,15 @@ optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                       weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
 state_dict_path = input('type the path of state_dict, or nothing to retrain the net')
 if state_dict_path:
-    model = torch.load(save_path+state_dict_path)
+    model = torch.load(model_path + state_dict_path)
     optimizer.load_state_dict(model['optimizer_state_dict'])
     resnet18.load_state_dict(model['model_state_dict'])
 
 if __name__ == '__main__':
     # print(resnet18)
     print('start training!')
-    epoch_count = 0
+    bad_train_data, _ = import_bad_data()
+    good_train_data, _ = import_good_data()
     np.random.shuffle(bad_train_data)
     np.random.shuffle(good_train_data)
     epoch = 0 
@@ -114,12 +126,6 @@ if __name__ == '__main__':
             optimizer.zero_grad()
 
             outputs = resnet18.forward(images)
-            # outputs = outputs[0, :]
-            # print('outputs shape', outputs.shape)
-            # print('labels shape', labels.shape)
-            # print(labels[2].type())
-            # outputs = outputs[:, 1] > outputs[:, 0]
-            # print(outputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -130,7 +136,7 @@ if __name__ == '__main__':
             print(''.join(['epoch: ', str(epoch), ', iter: ', str(batch_count),
                            ', loss: ', str(loss.item()), ', accuracy: ', str(accuracy)]))
 
-            if batch_count % SAVE_ITER == 0:
+            if batch_count % SAVE_ITER == 0:  # save the model
                 torch.save({
                     'epoch': epoch,
                     'batch': batch_count,
@@ -138,7 +144,7 @@ if __name__ == '__main__':
                     'model_state_dict': resnet18.state_dict(),
                     'accuracy': correct_sum / ((batch_count % SAVE_ITER + 1) * BATCH_SIZE),
 
-                }, ''.join([save_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
+                }, ''.join([model_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
                 print('save success')
                 correct_sum = 0
 
