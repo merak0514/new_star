@@ -16,6 +16,7 @@ end2 = '.png'
 
 
 def cut(image_origin_1, image_origin_2, origin_pos, size=(25, 25)):
+
     x_choices = np.arange(4) * 25
     y_choices = np.arange(4) * 25
 
@@ -25,6 +26,8 @@ def cut(image_origin_1, image_origin_2, origin_pos, size=(25, 25)):
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
             if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
+                print('yyyyy')
+                input(1)
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
                 labels.append(0)
@@ -52,7 +55,7 @@ def cut_all(csv_file,
     all_good_txt = os.listdir(good_train_set_label_path)
     for txt in all_good_txt:
         txt_data = open(good_train_set_label_path+txt).readline().split(' ')
-        good_data.append((txt_data[0], (txt_data[1], txt_data[2])))
+        good_data.append((txt_data[0], (int(txt_data[1]), int(txt_data[2]))))
     for i in good_data:
         print(i)
         image_name = i[0]
