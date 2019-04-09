@@ -15,7 +15,7 @@ import numpy as np
 import os
 import re
 
-epoch = 7
+epoch = 0
 LR = 0.01
 BATCH_SIZE = 64
 SAVE_ITER = 50
@@ -36,7 +36,7 @@ def import_data():
     with open(train_set_label_path) as f:
         csv_reader = csv.reader(f)
         for row in csv_reader:
-            if int(row[1]) == 0:
+            if row[1] == '0':
                 bad_data.append(row[0])
             else:
                 good_data.append(row[0])
@@ -108,9 +108,9 @@ if __name__ == '__main__':
                 if ty == 0:  # 负样本
                     image_name = bad_train_data[bad_data_counter]
                     image_b = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
                     image_c = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
 
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
@@ -121,9 +121,9 @@ if __name__ == '__main__':
                 elif ty == 1:  # 正样本
                     image_name = good_train_data[good_data_counter]
                     image_b = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
                     image_c = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
 
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
