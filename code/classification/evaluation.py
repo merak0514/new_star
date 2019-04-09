@@ -41,6 +41,7 @@ def find_newest_model(name=None):
             max_batch = max(int(re.findall('batch_([0-9]+)', model_name_)[0]), max_epoch)
             current_choice = model_name_
 
+    print(current_choice)
     if not current_choice:
         input('curren_choice wrong')
     else:
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     model_name = find_newest_model()
     model = torch.load(model_path+model_name)
     resnet18.load_state_dict(model['model_state_dict'])
+    print('train set accuracy: ' + str(model['accuracy']))
     _, bad_test_data = classification.import_bad_data()
     _, good_test_data = classification.import_good_data()
     np.random.shuffle(bad_test_data)
