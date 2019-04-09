@@ -125,7 +125,7 @@ if __name__ == '__main__':
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     bad_data_counter += 1
-                    if bad_data_counter >= len(bad_data):
+                    if bad_data_counter >= len(bad_train_data):
                         bad_data_counter = 0
                         break
                 elif ty == 1:  # 正样本
@@ -138,7 +138,7 @@ if __name__ == '__main__':
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     good_data_counter += 1
-                    if good_data_counter >= len(good_data):
+                    if good_data_counter >= len(good_train_data):
                         good_data_counter = 0
                         break
                 else:
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                     'batch': batch_count,
                     'optimizer_state_dict': optimizer.state_dict(),
                     'model_state_dict': resnet18.state_dict(),
-                    'accuracy': correct_sum / ((SAVE_ITER) * BATCH_SIZE),
+                    'accuracy': correct_sum / (SAVE_ITER * BATCH_SIZE),
 
                 }, ''.join([model_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
                 print('save success')
