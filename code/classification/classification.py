@@ -15,7 +15,8 @@ import numpy as np
 import os
 import re
 
-LR = 0.01
+epoch = 7
+LR = 0.003
 BATCH_SIZE = 64
 SAVE_ITER = 50
 train_data_set_path = '../../cut_data/'
@@ -60,7 +61,7 @@ def import_good_data():
     return good_train_data_, good_test_data
 
 
-def find_newest_model(name=None):
+def find_newest_model(name=None, model_path = './model2/'):
     if name:
         return model_path + name
     models = os.listdir(model_path)
@@ -101,7 +102,6 @@ if __name__ == '__main__':
     print('start training!')
     bad_train_data, _ = import_bad_data()
     good_train_data, _ = import_good_data()
-    epoch = 0
     resnet18.train()
     while True:  # 循环：一个一个epoch训练
         print('epoch:', epoch)
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             predict = (outputs[:, 1] > outputs[:, 0]).type(torch.LongTensor)
             correct_sum += sum((predict == labels).type(torch.FloatTensor))
             accuracy = sum((predict == labels).type(torch.FloatTensor)) / len(predict)
-            print(''.join(['epoch: ', str(epoch), ', iter: ', str(batch_count),
+            print(''.join(['epoch: ', str(epoch), ', batch: ', str(batch_count),
                            ', loss: ', str(loss.item()), ', accuracy: ', str(accuracy)]))
 
             if batch_count % SAVE_ITER == 0:  # save the model
