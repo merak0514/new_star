@@ -14,14 +14,7 @@ import cv2
 import numpy as np
 import os
 
-b = '_b'
-c = '_c'
-end = '.jpg'
-end2 = '.png'
 LR = 0.01
-resnet18 = resnet.resnet18()
-resnet18.train()
-
 BATCH_SIZE = 64
 EPOCH = 1
 SAVE_ITER = 50
@@ -32,6 +25,10 @@ good_train_data_set_path = '../../good_data/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
 model_path = './model2/'
+b = '_b'
+c = '_c'
+end = '.jpg'
+end2 = '.png'
 
 
 def import_bad_data():
@@ -63,18 +60,20 @@ def import_good_data():
     return good_train_data_, good_test_data
 
 
-classes = (0, 1)
-criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
-optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
-                      weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
-state_dict_path = input('type the path of state_dict, or nothing to retrain the net')
-if state_dict_path:
-    model = torch.load(model_path + state_dict_path)
-    optimizer.load_state_dict(model['optimizer_state_dict'])
-    resnet18.load_state_dict(model['model_state_dict'])
-
 if __name__ == '__main__':
+    resnet18 = resnet.resnet18()
+    resnet18.train()
     # print(resnet18)
+    classes = (0, 1)
+    criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
+    optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
+                          weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
+    state_dict_path = input('type the path of state_dict, or nothing to retrain the net')
+    if state_dict_path:
+        model = torch.load(model_path + state_dict_path)
+        optimizer.load_state_dict(model['optimizer_state_dict'])
+        resnet18.load_state_dict(model['model_state_dict'])
+
     print('start training!')
     bad_train_data, _ = import_bad_data()
     good_train_data, _ = import_good_data()
