@@ -36,9 +36,9 @@ def import_data():
     with open(train_set_label_path) as f:
         csv_reader = csv.reader(f)
         for row in csv_reader:
-            if int(row[3]) == 0:
+            if int(row[1]) == 0:
                 bad_data.append(row[0])
-            elif int(row[3]) == 1:
+            else:
                 good_data.append(row[0])
     bad_data = np.array(bad_data)
     good_data = np.array(good_data)
