@@ -27,30 +27,9 @@ end2 = '.png'
 TEST_SIZE = 1000
 
 
-def find_newest_model(name=None):
-    if name:
-        return model_path + name
-    models = os.listdir(model_path)
-    max_epoch = 0
-    max_batch = 0
-    current_choice = None
-    for model_name_ in models:
-        max_epoch = max(int(re.findall('epoch_([0-9]+)', model_name_)[0]), max_epoch)
-    for model_name_ in models:
-        if int(re.findall('epoch_([0-9]+)', model_name_)[0]) == max_epoch:
-            max_batch = max(int(re.findall('batch_([0-9]+)', model_name_)[0]), max_batch)
-            current_choice = model_name_
-
-    print(current_choice)
-    if not current_choice:
-        input('curren_choice wrong')
-    else:
-        return current_choice
-
-
 if __name__ == '__main__':
     print('start evaluating!')
-    model_name = find_newest_model()
+    model_name = classification.find_newest_model()
     model = torch.load(model_path+model_name)
     resnet18.load_state_dict(model['model_state_dict'])
     print('train set accuracy: ' + str(model['accuracy']))
