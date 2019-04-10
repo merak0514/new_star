@@ -9,6 +9,28 @@ c = '_c'
 end = '.jpg'
 
 
+def cut_black(img1, img2):
+    black_count = [0, 0, 0, 0]
+    for direction in range(4):
+        img1 = np.rot90(img1, direction)
+        img2 = np.rot90(img2, direction)
+        flag = 0
+        size = img1.shape
+        for i in range(size[0]):
+            for j in range(size[1]):
+                if img1[i, j] != 0:
+                    flag = 1
+                    break
+            if flag == 1:
+                break
+            black_count[direction] += 1
+        img1 = img1[black_count[direction]:, :]
+        img2 = img2[black_count[direction]:, :]
+        img1 = np.rot90(img1, -direction)
+        img2 = np.rot90(img2, -direction)
+    return img1, img2
+
+
 def cut(image1, image2, cut_size=(100, 100)):
     size = image1.shape
     xs = np.arange(size[0] // cut_size[0]) * cut_size[0]
@@ -144,6 +166,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, c, end)))
     img_c = np.array(img_c[:, :, 0], np.uint8)
 
+    img_b, img_c = cut_black(img_b, img_c)
     img_b = adjust_average(img_b, img_c)
     img_b = cut_too_small(img_b, lambda_=1.4)
     img_b = cut_too_large(img_b)
@@ -152,13 +175,13 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cut_too_large(img_c)
     img_c = middle_filter(img_c)
 
-    temp = random_cut(img_b, img_c, (100, 100), 40, 10, pos)
+    temp = random_cut(img_b, img_c, (50, 50), 0, 50, pos)
     if temp == -1:
         return
     else:
         cut_images_b, cut_images_c, labels = temp
 
-    path = ''.join(['../cut_data/', image_name[:2]])
+    path = ''.join(['../cut_data2/', image_name[:2]])
     if not os.path.exists(path):
         print(path)
         os.makedirs(path)
@@ -176,7 +199,6 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
 
 
 def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv', start=0):
-    """对文件夹中所有图片（不包括子文件夹中）做处理"""
     if not os.path.exists(csv_path):
         print('No file')
         return -1
@@ -192,8 +214,8 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
     if input('Print y to continue') is not 'y':
         exit()
 
-    csv_file = open('../cut_data/labels.csv', 'a+')
-    # csv_file = open('../cut_data/labels.csv', 'a+', newline='')
+    csv_file = open('../cut_data2/labels.csv', 'a+')
+    # csv_file = open('../cut_data2/labels.csv', 'a+', newline='')
     for datum in train_data:
         print(datum)
         image_name = datum[0]
@@ -208,6 +230,4 @@ if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
     process_and_cut_all_image(start=2060)
-
-
     pass
