@@ -189,7 +189,7 @@ if __name__ == '__main__':
                     'accuracy': correct_sum / (SAVE_ITER * BATCH_SIZE),
 
                 }, ''.join([model_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
-                print('save success')
+                print('save success, ', 'accuracy: ', str(correct_sum / (SAVE_ITER * BATCH_SIZE)))
                 correct_sum = 0
                 delete_former_model(model_path)
 
