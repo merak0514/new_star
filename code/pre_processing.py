@@ -9,7 +9,7 @@ c = '_c'
 end = '.jpg'
 
 
-def cut_black(img1, img2):
+def cut_black(img1, img2, origin_pos):
     black_count = [0, 0, 0, 0]
     for direction in range(4):
         img1 = np.rot90(img1, direction)
@@ -26,6 +26,10 @@ def cut_black(img1, img2):
             black_count[direction] += 1
         img1 = img1[black_count[direction]:, :]
         img2 = img2[black_count[direction]:, :]
+        if direction == 0:
+            origin_pos = [origin_pos[0] - black_count, origin_pos[1]]
+        if direction == 3:
+            origin_pos = [origin_pos[0], origin_pos[1] - black_count]
         img1 = np.rot90(img1, -direction)
         img2 = np.rot90(img2, -direction)
     return img1, img2
@@ -122,7 +126,7 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     """
     image_origin_1 = np.array(image_origin_1, np.uint8)
     x_len, y_len = np.shape(image_origin_1)
-    # x_len, y_len = (1000, 100)  # 测试用
+    x_len, y_len = (1000, 400)  # 测试用
     if size[0] >= x_len or size[1] >= y_len:
         print("too large size")
         if not ignore_anomaly:
@@ -144,8 +148,8 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
                 labels.append(0)
-    # print(combines)
-    # print(labels)
+    print(combines)
+    print(labels)
 
     images_1 = []
     for position in combines:
@@ -166,7 +170,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, c, end)))
     img_c = np.array(img_c[:, :, 0], np.uint8)
 
-    img_b, img_c = cut_black(img_b, img_c)
+    img_b, img_c = cut_black(img_b, img_c, pos)
     img_b = adjust_average(img_b, img_c)
     img_b = cut_too_small(img_b, lambda_=1.4)
     img_b = cut_too_large(img_b)
@@ -229,5 +233,6 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
-    process_and_cut_all_image(start=0)
+    random_cut([[1]],[1], (50,50), 1, 49, (75, 95))
+    # process_and_cut_all_image(start=0)
     pass
