@@ -214,7 +214,6 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
             train_data.append(row)
     train_data = train_data[1+start:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
-    train_data = np.random.seed(0)
 
     if input('Print y to continue') is not 'y':
         exit()
