@@ -171,8 +171,9 @@ if __name__ == '__main__':
             predict = (outputs[:, 1] > outputs[:, 0]).cuda().type(torch.LongTensor)
             correct_sum += sum((predict == labels).type(torch.FloatTensor))
             accuracy = sum((predict == labels).type(torch.FloatTensor)) / len(predict)
-            print(''.join(['epoch: ', str(epoch), ', batch: ', str(batch_count),
-                           ', loss: ', str(loss.item()), ', accuracy: ', str(accuracy)]))
+            if batch_count % 100 == 0:  # print sth every 100 iter
+                print(''.join(['epoch: ', str(epoch), ', batch: ', str(batch_count),
+                               ', loss: ', str(loss.item()), ', accuracy: ', str(accuracy)]))
 
             if batch_count % SAVE_ITER == 0:  # save the model
                 torch.save({
