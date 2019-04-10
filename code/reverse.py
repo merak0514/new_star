@@ -124,8 +124,10 @@ if __name__ == "__main__":
 
     for row in train_data:
         img_name, x, y, label = row[0], int(row[1]), int(row[2]), row[3]
-
-        img_list = os.listdir(''.join([train_image_path, img_name[:2],'/']))
+        try:
+            img_list = os.listdir(''.join([train_image_path, img_name[:2],'/']))
+        except:
+            pass
         for img_full_name in img_list:
             if img_name in img_full_name:
                 img_path = ''.join([train_image_path, img_name[:2],'/',img_full_name])
