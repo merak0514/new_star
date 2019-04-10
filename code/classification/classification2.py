@@ -28,7 +28,6 @@ b = '_b'
 c = '_c'
 end = '.jpg'
 end2 = '.png'
-device = torch.device('cuda')
 
 
 def import_data():
@@ -51,8 +50,6 @@ def import_data():
     good_train_data_ = good_data[: int(0.8 * len(good_data))]
     good_test_data = good_data[int(0.8 * len(good_data)):]
     return bad_train_data_, bad_test_data, good_train_data_, good_test_data
-
-
 
 
 if __name__ == '__main__':
@@ -78,9 +75,9 @@ if __name__ == '__main__':
         np.random.shuffle(good_train_data)
         correct_sum = 0
         batch_count = 0
-        bad_data_counter = 0
-        good_data_counter = 0
         while True:  # 循环：一个一个batch训练
+            bad_data_counter = 0
+            good_data_counter = 0
             # 构建一个0/1随机分布（不一定数量相等，但数学期望上数量相等）的label list
             labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE)).cuda().type(torch.LongTensor)
 
@@ -90,40 +87,32 @@ if __name__ == '__main__':
                     image_name = bad_train_data[bad_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
-                    image_b = image_b.to(device)
                     image_c = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
-                    image_c = image_c.to(device)
 
-                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).to(device).cuda()  # 作为二通道的输入
+                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).cuda()  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     bad_data_counter += 1
                     if bad_data_counter >= len(bad_train_data):
-                        bad_data_counter = 0
                         break
                 elif ty == 1:  # 正样本
                     image_name = good_train_data[good_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
-                    image_b = image_b.to(device)
                     image_c = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
-                    image_c = image_c.to(device)
 
-                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).to(device).cuda()  # 作为二通道的输入
+                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).cuda()  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     good_data_counter += 1
                     if good_data_counter >= len(good_train_data):
-                        good_data_counter = 0
                         break
             if len(images) < BATCH_SIZE:
-                good_data_counter = 0
-                bad_data_counter = 0
                 break
-            images = images.permute((0, 3, 1, 2)).to(device)  # 换为b, c, w, h
+            images = images.permute((0, 3, 1, 2))  # 换为b, c, w, h
 
             optimizer.zero_grad()
-            outputs = resnet18.forward(images)
+            outputs = resnet18.forward(images).cuda()
             loss = criterion(outputs, labels.cuda())
             loss.backward()
             optimizer.step()
@@ -147,57 +136,5 @@ if __name__ == '__main__':
                 print('save success, ', 'accuracy: ', str(correct_sum / (SAVE_ITER * BATCH_SIZE)))
                 correct_sum = 0
                 classification.delete_former_model(model_path)
-        # for batch_count in range(min(len(bad_train_data), len(good_train_data)) // BATCH_SIZE):
-        #     bad_data = bad_train_data[batch_count * BATCH_SIZE / 2: (batch_count + 1) * BATCH_SIZE / 2]
-        #     good_data = good_train_data[batch_count * BATCH_SIZE / 2: (batch_count + 1) * BATCH_SIZE / 2]
-        #     images = torch.Tensor([])  # b,w,h,c
-        #     # labels = torch.zeros(BATCH_SIZE, dtype=torch.long)
-        #
-        #     for i, image_name in enumerate(bad_data, 0):
-        #         image_b = torch.Tensor(cv2.imread
-        #                                (''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
-        #         image_c = torch.Tensor(cv2.imread
-        #                                (''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
-        #         # image_b = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_b.jpg')[:, :, 0])
-        #         # image_c = torch.Tensor(cv2.imread('../../cut_data/d5/d52f52b895f03a214a3a077acd253066_0_c.jpg')[:, :, 0])
-        #
-        #         image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
-        #         images = torch.cat((images, image_combine.unsqueeze(0)), 0)
-        #
-        #         # print('labels', labels)
-        #     images = images.permute((0, 3, 1, 2))
-        #     # print('image shape', images.shape)
-        #
-        #     optimizer.zero_grad()
-        #
-        #     outputs = resnet18.forward(images)
-        #     # outputs = outputs[0, :]
-        #     # print('outputs shape', outputs.shape)
-        #     # print('labels shape', labels.shape)
-        #     # print(labels[2].type())
-        #     # outputs = outputs[:, 1] > outputs[:, 0]
-        #     # print(outputs)
-        #     loss = criterion(outputs, labels)
-        #     loss.backward()
-        #     optimizer.step()
-        #
-        #     predict = (outputs[:, 1] > outputs[:, 0]).type(torch.LongTensor)
-        #     correct_sum += sum((predict == labels).type(torch.FloatTensor))
-        #     accuracy = sum((predict == labels).type(torch.FloatTensor)) / len(predict)
-        #     print(''.join(['epoch: ', str(epoch), ', iter: ', str(batch_count),
-        #                    ', loss: ', str(loss.item()), ', accuracy: ', str(accuracy)]))
-        #     # print(correct_sum/((batch_count%SAVE_ITER + 1)*BATCH_SIZE))
-        #
-        #     if batch_count % SAVE_ITER == 0:
-        #         torch.save({
-        #             'epoch': epoch,
-        #             'batch': batch_count,
-        #             'optimizer_state_dict': optimizer.state_dict(),
-        #             'model_state_dict': resnet18.state_dict(),
-        #             'accuracy': correct_sum / ((batch_count % SAVE_ITER + 1) * BATCH_SIZE),
-        #
-        #         }, ''.join([save_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
-        #         print('save success')
-        #         correct_sum = 0
 
         epoch += 1
