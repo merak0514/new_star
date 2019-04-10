@@ -126,7 +126,7 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     """
     image_origin_1 = np.array(image_origin_1, np.uint8)
     x_len, y_len = np.shape(image_origin_1)
-    x_len, y_len = (1000, 400)  # 测试用
+    # x_len, y_len = (1000, 400)  # 测试用
     if size[0] >= x_len or size[1] >= y_len:
         print("too large size")
         if not ignore_anomaly:
@@ -233,6 +233,6 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
-    random_cut([[1]],[1], (50,50), 1, 49, (75, 95))
-    # process_and_cut_all_image(start=0)
+    # random_cut([[1]],[1], (50,50), 1, 49, (300, 1))
+    process_and_cut_all_image(start=0)
     pass
