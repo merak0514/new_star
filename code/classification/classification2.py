@@ -16,7 +16,7 @@ import os
 import re
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '8'
-epoch = 2 
+epoch = 3
 LR = 0.001
 BATCH_SIZE = 64
 SAVE_ITER = 500
@@ -116,6 +116,10 @@ if __name__ == '__main__':
                     if good_data_counter >= len(good_train_data):
                         good_data_counter = 0
                         break
+            if len(images) < BATCH_SIZE:
+                good_data_counter = 0
+                bad_data_counter = 0
+                break
             images = images.permute((0, 3, 1, 2)).to(device)  # 换为b, c, w, h
 
             optimizer.zero_grad()

@@ -160,6 +160,10 @@ if __name__ == '__main__':
                         break
                 else:
                     input('wrong')
+            if len(images) < BATCH_SIZE:
+                good_data_counter = 0
+                bad_data_counter = 0
+                break
             images = images.permute((0, 3, 1, 2))  # 换为b, c, w, h
 
             optimizer.zero_grad()
