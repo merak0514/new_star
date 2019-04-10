@@ -16,7 +16,7 @@ import os
 import re
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '8'
-epoch = 1 
+epoch = 2 
 LR = 0.001
 BATCH_SIZE = 64
 SAVE_ITER = 500
