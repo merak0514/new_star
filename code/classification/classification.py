@@ -15,8 +15,8 @@ import numpy as np
 import os
 import re
 os.environ['CUDA_VISIBLE_DEVICES'] = '8'
-epoch = 8 
-LR = 0.001
+epoch = 14
+LR = 0.0001
 BATCH_SIZE = 64
 SAVE_ITER = 500
 train_data_set_path = '../../cut_data/'

@@ -16,8 +16,8 @@ import os
 import re
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '8'
-epoch = 3
-LR = 0.001
+epoch = 10 
+LR = 0.01
 BATCH_SIZE = 64
 SAVE_ITER = 500
 train_data_set_path = '../../good_data2/'
