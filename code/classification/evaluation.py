@@ -13,7 +13,7 @@ import numpy as np
 import cv2
 os.environ['CUDA_VISIBLE_DEVICES'] = '8'
 
-resnet18 = resnet.resnet18().cuda
+resnet18 = resnet.resnet18().cuda()
 resnet18.eval()
 
 model_path = './model2/'
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         
     print('testing bad data')
     bad_labels = torch.zeros(TEST_SIZE).type(torch.LongTensor)
-    bad_images = torch.Tensor([])
+    bad_images = torch.Tensor([]).cuda()
     for i in range(TEST_SIZE):
         image_name = bad_test_data[i]
         image_b = torch.Tensor(
