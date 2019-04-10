@@ -32,7 +32,7 @@ def cut_black(img1, img2, origin_pos):
             origin_pos = [origin_pos[0], origin_pos[1] - black_count]
         img1 = np.rot90(img1, -direction)
         img2 = np.rot90(img2, -direction)
-    return img1, img2
+    return img1, img2, origin_pos
 
 
 def cut(image1, image2, cut_size=(100, 100)):
@@ -148,8 +148,8 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
                 labels.append(0)
-    print(combines)
-    print(labels)
+    # print(combines)
+    # print(labels)
 
     images_1 = []
     for position in combines:
@@ -170,7 +170,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cv2.imread(''.join((train_image_path, image_name[:2], '/', image_name, c, end)))
     img_c = np.array(img_c[:, :, 0], np.uint8)
 
-    img_b, img_c = cut_black(img_b, img_c, pos)
+    img_b, img_c, pos = cut_black(img_b, img_c, pos)
     img_b = adjust_average(img_b, img_c)
     img_b = cut_too_small(img_b, lambda_=1.4)
     img_b = cut_too_large(img_b)
