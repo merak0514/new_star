@@ -9,6 +9,27 @@ c = '_c'
 end = '.jpg'
 
 
+def cut(image1, image2, cut_size=(100, 100)):
+    size = image1.shape
+    xs = np.arange(size[0] // cut_size[0]) * cut_size[0]
+    xs = np.append(xs, size[0] - cut_size[0])
+    ys = np.arange(size[1] // cut_size[1]) * cut_size[14]
+    ys = np.append(ys, size[1] - cut_size[1])
+    cuts_pos = []
+    for i in xs:
+        for j in ys:
+            cuts_pos.append((i, j))
+    cuts_b = []
+    cuts_c = []
+    for position in cuts_pos:
+        image = image1[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
+        cuts_b.append(image)
+    for position in cuts_pos:
+        image = image2[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
+        cuts_c.append(image)
+    return cuts_b, cuts_c
+
+
 def compute_diff(image1, image2):
     """计算差值,小于0归零"""
     image = np.array(image1, np.int) - np.array(image2, np.int)
