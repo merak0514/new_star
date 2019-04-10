@@ -226,7 +226,7 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
         image_name = datum[0]
         pos = (int(datum[1]), int(datum[2]))
         _process_and_cut_a_image(image_name, pos, csv_file)
-        break
+        # break
 
     csv_file.close()
 
@@ -235,5 +235,5 @@ if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
     # random_cut([[1]],[1], (50,50), 1, 49, (300, 1))
-    process_and_cut_all_image(start=1310)
+    process_and_cut_all_image(start=0)
     pass
