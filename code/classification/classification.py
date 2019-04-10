@@ -15,15 +15,15 @@ import numpy as np
 import os
 import re
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-epoch = 14
-LR = 0.0001
+epoch = 0
+LR = 0.001
 BATCH_SIZE = 64
 SAVE_ITER = 500
-train_data_set_path = '../../cut_data/'
-good_train_data_set_path = '../../good_data/'
+train_data_set_path = '../../cut_data2/'
+good_train_data_set_path = '../../good_data50/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
-model_path = './model2/'
+model_path = './model50/'
 b = '_b'
 c = '_c'
 end = '.jpg'
@@ -31,7 +31,7 @@ end2 = '.png'
 
 
 def import_bad_data():
-    train_set_label_path = '../new_labels.csv'
+    train_set_label_path = '../../cut_data2/new_labels.csv'
     bad_data = []
     with open(train_set_label_path) as f:
         csv_reader = csv.reader(f)
@@ -48,7 +48,7 @@ def import_bad_data():
 
 
 def import_good_data():
-    good_train_set_label_path = '../../good_data/label/'
+    good_train_set_label_path = '../../good_data50/label/'
     good_data = []
     all_good_txt = os.listdir(good_train_set_label_path)
     for txt in all_good_txt:
@@ -61,7 +61,7 @@ def import_good_data():
     return good_train_data_, good_test_data
 
 
-def find_newest_model(model_path_ = './model2/', name=None):
+def find_newest_model(model_path_='./model50/', name=None):
     if name:
         return name
     models = os.listdir(model_path_)
@@ -79,12 +79,12 @@ def find_newest_model(model_path_ = './model2/', name=None):
 
     print(current_choice)
     if not current_choice:
-        input('curren_choice wrong')
+        input('current_choice wrong')
     else:
         return current_choice
 
 
-def delete_former_model(model_path_='./model2/'):
+def delete_former_model(model_path_):
     models = os.listdir(model_path_)
     newest_model = find_newest_model(model_path_)
     max_epoch = int(re.findall('epoch_([0-9]+)', newest_model)[0])
