@@ -129,8 +129,11 @@ if __name__ == "__main__":
         for img_full_name in img_list:
             if img_name in img_full_name:
                 img_path = ''.join([train_image_path, img_name[:2],'/',img_full_name])
-    
-                img = cv2.imread(img_path)
+
+                try:
+                    img = cv2.imread(img_path)
+                except:
+                    pass
 
                 # img = cv2.circle(img, (x, y), 5, (0, 255, 0), 1)
                 # cv2.imshow('img2', img)
