@@ -27,6 +27,7 @@ b = '_b'
 c = '_c'
 end = '.jpg'
 end2 = '.png'
+device = torch.device('cuda')
 
 
 def import_data():
@@ -75,7 +76,7 @@ def find_newest_model(name=None, model_path = './model25/'):
 
 
 if __name__ == '__main__':
-    resnet18 = resnet.resnet18()
+    resnet18 = resnet.resnet18().to(device)
     resnet18.train()
     classes = (0, 1)
     criterion = nn.CrossEntropyLoss()  # 损失函数为交叉熵
@@ -101,18 +102,20 @@ if __name__ == '__main__':
         good_data_counter = 0
         while True:  # 循环：一个一个batch训练
             # 构建一个0/1随机分布（不一定数量相等，但数学期望上数量相等）的label list
-            labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE)).type(torch.LongTensor)
+            labels = torch.ge(torch.randn(BATCH_SIZE), torch.randn(BATCH_SIZE)).type(torch.LongTensor).to(device)
 
-            images = torch.Tensor([])
+            images = torch.Tensor([]).to(device)
             for ty in labels:  # 按照构建的label list 挑选正负样本
                 if ty == 0:  # 负样本
                     image_name = bad_train_data[bad_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
+                    image_b = image_b.to(device)
                     image_c = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
+                    image_c = image_c.to(device)
 
-                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
+                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).to(device)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     bad_data_counter += 1
                     if bad_data_counter >= len(bad_train_data):
@@ -122,16 +125,18 @@ if __name__ == '__main__':
                     image_name = good_train_data[good_data_counter]
                     image_b = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end2])))[:, :, 0]
+                    image_b = image_b.to(device)
                     image_c = torch.Tensor(
                         cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end2])))[:, :, 0]
+                    image_c = image_c.to(device)
 
-                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2)  # 作为二通道的输入
+                    image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).to(device)  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
                     good_data_counter += 1
                     if good_data_counter >= len(good_train_data):
                         good_data_counter = 0
                         break
-            images = images.permute((0, 3, 1, 2))  # 换为b, c, w, h
+            images = images.permute((0, 3, 1, 2)).to(device)  # 换为b, c, w, h
 
             optimizer.zero_grad()
             outputs = resnet18.forward(images)
