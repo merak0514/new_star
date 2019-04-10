@@ -18,7 +18,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '8'
 epoch = 7
 LR = 0.003
 BATCH_SIZE = 64
-SAVE_ITER = 50
+SAVE_ITER = 500
 train_data_set_path = '../../cut_data/'
 good_train_data_set_path = '../../good_data/'
 IMAGE_B = 'image_b/'
@@ -61,10 +61,10 @@ def import_good_data():
     return good_train_data_, good_test_data
 
 
-def find_newest_model(name=None, model_path = './model2/'):
+def find_newest_model(name=None, model_path_ = './model2/'):
     if name:
-        return model_path + name
-    models = os.listdir(model_path)
+        return model_path_ + name
+    models = os.listdir(model_path_)
     max_epoch = 0
     max_batch = 0
     current_choice = None
@@ -82,6 +82,17 @@ def find_newest_model(name=None, model_path = './model2/'):
         input('curren_choice wrong')
     else:
         return current_choice
+
+
+def delete_former_model(model_path_='./model2/'):
+    models = os.listdir(model_path_)
+    newest_model = find_newest_model(model_path_)
+    max_epoch = int(re.findall('epoch_([0-9]+)', newest_model)[0])
+    max_batch = int(re.findall('batch_([0-9]+)', newest_model)[0])
+    for model_name in models:
+        if (int(re.findall('epoch_([0-9]+)', model_name)[0]) < max_epoch) and \
+                (int(re.findall('batch_([0-9]+)', model_name)[0]) != 1000):
+            os.remove(model_path_+model_name)
 
 
 if __name__ == '__main__':
@@ -171,6 +182,7 @@ if __name__ == '__main__':
                 }, ''.join([model_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
                 print('save success')
                 correct_sum = 0
+                delete_former_model(model_path)
 
         # for batch_count in range(min(len(bad_train_data), len(good_train_data)) // BATCH_SIZE):
         #     bad_data = bad_train_data[batch_count * BATCH_SIZE / 2: (batch_count + 1) * BATCH_SIZE / 2]

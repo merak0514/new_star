@@ -19,7 +19,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '8'
 epoch = 1 
 LR = 0.01
 BATCH_SIZE = 64
-SAVE_ITER = 50
+SAVE_ITER = 500
 train_data_set_path = '../../good_data2/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
@@ -53,27 +53,6 @@ def import_data():
     return bad_train_data_, bad_test_data, good_train_data_, good_test_data
 
 
-def find_newest_model(name=None, model_path = './model25/'):
-    if name:
-        return model_path + name
-    models = os.listdir(model_path)
-    max_epoch = 0
-    max_batch = 0
-    current_choice = None
-    for model_name_ in models:
-        max_epoch = max(int(re.findall('epoch_([0-9]+)', model_name_)[0]), max_epoch)
-    for model_name_ in models:
-        if int(re.findall('epoch_([0-9]+)', model_name_)[0]) == max_epoch:
-            temp = int(re.findall('batch_([0-9]+)', model_name_)[0])
-            if temp > max_batch:
-                max_batch = temp
-                current_choice = model_name_
-
-    print(current_choice)
-    if not current_choice:
-        input('curren_choice wrong')
-    else:
-        return current_choice
 
 
 if __name__ == '__main__':
@@ -84,7 +63,7 @@ if __name__ == '__main__':
     optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                           weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
 
-    state_dict_path = find_newest_model()
+    state_dict_path = classification.find_newest_model(model_path)
     if state_dict_path:
         model = torch.load(model_path + state_dict_path)
         optimizer.load_state_dict(model['optimizer_state_dict'])
@@ -162,7 +141,7 @@ if __name__ == '__main__':
                 }, ''.join([model_path, 'save_epoch_', str(epoch), '_batch_', str(batch_count), '.net']))
                 print('save success, ', 'accuracy: ', str(correct_sum / (SAVE_ITER * BATCH_SIZE)))
                 correct_sum = 0
-
+                classification.delete_former_model(model_path)
         # for batch_count in range(min(len(bad_train_data), len(good_train_data)) // BATCH_SIZE):
         #     bad_data = bad_train_data[batch_count * BATCH_SIZE / 2: (batch_count + 1) * BATCH_SIZE / 2]
         #     good_data = good_train_data[batch_count * BATCH_SIZE / 2: (batch_count + 1) * BATCH_SIZE / 2]
