@@ -26,8 +26,6 @@ def cut(image_origin_1, image_origin_2, origin_pos, size=(25, 25)):
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
             if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
-                print('yyyyy')
-                input(1)
                 labels.append((origin_pos[0]-i, origin_pos[1]-j))
             else:
                 labels.append(0)
