@@ -27,9 +27,9 @@ def cut_black(img1, img2, origin_pos):
         img1 = img1[black_count[direction]:, :]
         img2 = img2[black_count[direction]:, :]
         if direction == 0:
-            origin_pos = [origin_pos[0] - black_count, origin_pos[1]]
+            origin_pos = [origin_pos[0], origin_pos[1] - black_count[0]]
         if direction == 3:
-            origin_pos = [origin_pos[0], origin_pos[1] - black_count]
+            origin_pos = [origin_pos[0] - black_count[1], origin_pos[1]]
         img1 = np.rot90(img1, -direction)
         img2 = np.rot90(img2, -direction)
     return img1, img2, origin_pos
@@ -144,12 +144,12 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
     for i in x_choices:
         for j in y_choices:
             combines.append((i, j))  # 相当于添加每个方框的开始坐标
-            if (i <= origin_pos[0] < i+size[0]) and (j <= origin_pos[1] < j+size[1]):
-                labels.append((origin_pos[0]-i, origin_pos[1]-j))
+            if (j <= origin_pos[0] < j+size[0]) and (i <= origin_pos[1] < i+size[1]):
+                labels.append((origin_pos[0]-j, origin_pos[1]-i))
             else:
                 labels.append(0)
-    # print(combines)
-    # print(labels)
+    print(combines)
+    print(labels)
 
     images_1 = []
     for position in combines:
@@ -179,7 +179,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cut_too_large(img_c)
     img_c = middle_filter(img_c)
 
-    temp = random_cut(img_b, img_c, (50, 50), 1, 50, pos)
+    temp = random_cut(img_b, img_c, (50, 50), 1, 49, pos)
     if temp == -1:
         return
     else:
@@ -214,6 +214,7 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
             train_data.append(row)
     train_data = train_data[1+start:]  # 去掉第一行
     print('The length of train_data is {}'.format(len(train_data)))
+    train_data = np.random.seed(0)
 
     if input('Print y to continue') is not 'y':
         exit()
@@ -225,7 +226,7 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
         image_name = datum[0]
         pos = (int(datum[1]), int(datum[2]))
         _process_and_cut_a_image(image_name, pos, csv_file)
-        # break
+        break
 
     csv_file.close()
 
@@ -234,5 +235,5 @@ if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
     # random_cut([[1]],[1], (50,50), 1, 49, (300, 1))
-    process_and_cut_all_image(start=0)
+    process_and_cut_all_image(start=1310)
     pass
