@@ -63,7 +63,7 @@ def import_good_data():
 
 def find_newest_model(model_path_ = './model2/', name=None):
     if name:
-        return model_path_ + name
+        return name
     models = os.listdir(model_path_)
     max_epoch = 0
     max_batch = 0
