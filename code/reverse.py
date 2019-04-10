@@ -115,9 +115,9 @@ def import_data(label_path):
 
 if __name__ == "__main__":
 
-    train_image_path = '../cut_data/'
-    train_label_path = '../cut_data/new_labels.csv'
-    save_path = '../good_data/'
+    train_image_path = '../cut_data2/'
+    train_label_path = '../cut_data2/new_labels.csv'
+    save_path = '../good_data50/'
 
     train_data = import_data(train_label_path)
     print("导出数据:\t",train_data)
