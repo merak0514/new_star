@@ -61,7 +61,7 @@ def import_good_data():
     return good_train_data_, good_test_data
 
 
-def find_newest_model(name=None, model_path_ = './model2/'):
+def find_newest_model(model_path_ = './model2/', name=None):
     if name:
         return model_path_ + name
     models = os.listdir(model_path_)

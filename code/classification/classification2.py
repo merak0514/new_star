@@ -63,7 +63,7 @@ if __name__ == '__main__':
     optimizer = optim.SGD(resnet18.parameters(), lr=LR, momentum=0.9,
                           weight_decay=5e-4)  # 优化方式为mini-batch momentum-SGD，并采用L2正则化（权重衰减）
 
-    state_dict_path = classification.find_newest_model(model_path)
+    state_dict_path = classification.find_newest_model(model_path_=model_path)
     if state_dict_path:
         model = torch.load(model_path + state_dict_path)
         optimizer.load_state_dict(model['optimizer_state_dict'])
