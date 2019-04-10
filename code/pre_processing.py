@@ -175,7 +175,7 @@ def _process_and_cut_a_image(image_name, pos, csv_file, train_image_path='../af2
     img_c = cut_too_large(img_c)
     img_c = middle_filter(img_c)
 
-    temp = random_cut(img_b, img_c, (50, 50), 0, 50, pos)
+    temp = random_cut(img_b, img_c, (50, 50), 1, 50, pos)
     if temp == -1:
         return
     else:
@@ -229,5 +229,5 @@ def process_and_cut_all_image(csv_path='../af2019-cv-training-20190312/list.csv'
 if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
-    process_and_cut_all_image(start=2060)
+    process_and_cut_all_image(start=0)
     pass
