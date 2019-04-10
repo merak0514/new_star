@@ -94,7 +94,8 @@ def delete_former_model(model_path_='./model2/'):
                 (int(re.findall('batch_([0-9]+)', model_name)[0]) != 1000):
             os.remove(model_path_+model_name)
         if (int(re.findall('epoch_([0-9]+)', model_name)[0]) == max_epoch) and \
-                (int(re.findall('batch_([0-9]+)', model_name)[0]) == max_batch % (SAVE_ITER * 10)):
+                (int(re.findall('batch_([0-9]+)', model_name)[0]) == max_batch % (SAVE_ITER * 10))and\
+                (int(re.findall('batch_([0-9]+)', model_name)[0]) != max_batch):
             os.remove(model_path_+model_name)
 
 
