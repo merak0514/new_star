@@ -9,7 +9,7 @@ c = '_c'
 end = '.jpg'
 
 
-def cut_black(img1, img2, origin_pos):
+def cut_black(img1, img2, origin_pos, get_count=False):
     black_count = [0, 0, 0, 0]
     for direction in range(4):
         img1 = np.rot90(img1, direction)
@@ -32,7 +32,10 @@ def cut_black(img1, img2, origin_pos):
             origin_pos = [origin_pos[0] - black_count[1], origin_pos[1]]
         img1 = np.rot90(img1, -direction)
         img2 = np.rot90(img2, -direction)
-    return img1, img2, origin_pos
+    if not get_count:
+        return img1, img2, origin_pos
+    else:
+        return img1, img2, black_count
 
 
 def cut(image1, image2, cut_size=(100, 100)):
@@ -45,15 +48,15 @@ def cut(image1, image2, cut_size=(100, 100)):
     for i in xs:
         for j in ys:
             cuts_pos.append((i, j))
-    cuts_b = []
-    cuts_c = []
+    cuts_b = np.array([])
+    cuts_c = np.array([])
     for position in cuts_pos:
         image = image1[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
-        cuts_b.append(image)
+        np.append(cuts_b, image)
     for position in cuts_pos:
         image = image2[position[0]: position[0] + size[0], position[1]: position[1] + size[1]]
-        cuts_c.append(image)
-    return cuts_b, cuts_c
+        np.append(cuts_c, image)
+    return cuts_b, cuts_c, cuts_pos
 
 
 def compute_diff(image1, image2):
