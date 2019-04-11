@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 import os
 import re
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 epoch = 0
 LR = 0.001
 BATCH_SIZE = 64
@@ -35,6 +35,7 @@ def import_bad_data():
     bad_data = []
     with open(train_set_label_path) as f:
         csv_reader = csv.reader(f)
+	next(csv_reader)
         for row in csv_reader:
             if int(row[3]) == 0:
                 bad_data.append(row[0])
@@ -134,10 +135,19 @@ if __name__ == '__main__':
             for ty in labels:  # 按照构建的label list 挑选正负样本
                 if ty == 0:  # 负样本
                     image_name = bad_train_data[bad_data_counter]
-                    image_b = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
-                    image_c = torch.Tensor(
-                        cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+		            # print(''.join([train_data_set_path,image_name[:2],'/',image_name,end2]))
+                    try:
+                        image_b = torch.Tensor(
+                            cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+                        image_c = torch.Tensor(
+                            cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+                    except:
+                        bad_data_counter += 1
+                        image_name = bad_train_data[bad_data_counter]
+                        image_b = torch.Tensor(
+                            cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+                        image_c = torch.Tensor(
+                            cv2.imread(''.join([train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
 
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).cuda() # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)
@@ -147,10 +157,18 @@ if __name__ == '__main__':
                         break
                 elif ty == 1:  # 正样本
                     image_name = good_train_data[good_data_counter]
-                    image_b = torch.Tensor(
-                        cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, end2])))[:, :, 0]
-                    image_c = torch.Tensor(
-                        cv2.imread(''.join([good_train_data_set_path, IMAGE_C, image_name, end2])))[:, :, 0]
+                    try:
+                        image_b = torch.Tensor(
+                            cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, end2])))[:, :, 0]
+                        image_c = torch.Tensor(
+                            cv2.imread(''.join([good_train_data_set_path, IMAGE_C, image_name, end2])))[:, :, 0]
+                    except:
+                        good_data_counter += 1
+                        image_name = good_train_data[good_data_counter]
+                        image_b = torch.Tensor(
+                            cv2.imread(''.join([good_train_data_set_path, IMAGE_B, image_name, end2])))[:, :, 0]
+                        image_c = torch.Tensor(
+                            cv2.imread(''.join([good_train_data_set_path, IMAGE_C, image_name, end2])))[:, :, 0]
 
                     image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).cuda()  # 作为二通道的输入
                     images = torch.cat((images, image_combine.unsqueeze(0)), 0)

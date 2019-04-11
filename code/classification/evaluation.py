@@ -11,26 +11,30 @@ import torch
 import classification
 import numpy as np
 import cv2
-os.environ['CUDA_VISIBLE_DEVICES'] = '8'
+import sys, os
+num = sys.argv[1]
+
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 resnet18 = resnet.resnet18().cuda()
 resnet18.eval()
 
-model_path = './model2/'
-bad_train_data_set_path = '../../cut_data/'
-good_train_data_set_path = '../../good_data/'
+model_path = './model50/'
+bad_train_data_set_path = '../../cut_data2/'
+good_train_data_set_path = '../../good_data50/'
 IMAGE_B = 'image_b/'
 IMAGE_C = 'image_c/'
 b = '_b'
 c = '_c'
 end = '.jpg'
 end2 = '.png'
-TEST_SIZE = 1000
+TEST_SIZE = 3000
 
 
 if __name__ == '__main__':
-    print('start evaluating net1!')
-    model_name = classification.find_newest_model()
+    print('start evaluating net!')
+    model_name = classification.find_newest_model(name='save_epoch_%s_batch_1000.net'%num)
     model = torch.load(model_path+model_name)
     resnet18.load_state_dict(model['model_state_dict'])
     print('train set accuracy: ' + str(model['accuracy']))
@@ -60,11 +64,18 @@ if __name__ == '__main__':
     bad_labels = torch.zeros(TEST_SIZE).type(torch.LongTensor)
     bad_images = torch.Tensor([]).cuda()
     for i in range(TEST_SIZE):
-        image_name = bad_test_data[i]
-        image_b = torch.Tensor(
-            cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
-        image_c = torch.Tensor(
-            cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+        try:
+            image_name = bad_test_data[i]
+            image_b = torch.Tensor(
+                cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+            image_c = torch.Tensor(
+                cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
+        except:
+            image_name = bad_test_data[i+TEST_SIZE]
+            image_b = torch.Tensor(
+                cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, b, end])))[:, :, 0]
+            image_c = torch.Tensor(
+                cv2.imread(''.join([bad_train_data_set_path, image_name[:2], '/', image_name, c, end])))[:, :, 0]
         image_combine = torch.cat((image_b.unsqueeze(2), image_c.unsqueeze(2)), dim=2).cuda()  # 作为二通道的输入
         bad_images = torch.cat((bad_images, image_combine.unsqueeze(0)), 0)
     bad_images = bad_images.permute((0, 3, 1, 2))
