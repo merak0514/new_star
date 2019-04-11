@@ -148,8 +148,8 @@ def random_cut(image_origin_1, image_origin_2, size, choosing_length, least_gap,
                 labels.append((origin_pos[0]-j, origin_pos[1]-i))
             else:
                 labels.append(0)
-    print(combines)
-    print(labels)
+#    print(combines)
+#    print(labels)
 
     images_1 = []
     for position in combines:
@@ -234,5 +234,5 @@ if __name__ == '__main__':
     # random_cut([[0]], [[0]], (50, 50), 20, 10, [50, 60])
     # 危险!
     # random_cut([[1]],[1], (50,50), 1, 49, (300, 1))
-    process_and_cut_all_image(start=0)
+    process_and_cut_all_image(start=2291)
     pass
