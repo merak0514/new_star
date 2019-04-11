@@ -19,8 +19,8 @@ b = '_b'
 c = '_c'
 end = '.jpg'
 
-data_set_list_path = '../../testb/list.csv'
-data_set_path = '../../testb/'
+data_set_list_path = '../testb/list.csv'
+data_set_path = '../testb/'
 model_path = './classification/model50/'
 data_set = []
 with open(data_set_list_path) as f:
@@ -68,16 +68,30 @@ for image_name in data_set:
 
     result = np.argmax(outputs[:, 2])
     coord = np.array(cut_pos[result]) + np.array(black_count[:2])
-    result_image = cuts_b[result]
+    b_result = cuts_b[result]
+    c_result = cuts_c[result]
+
+    result_image = pre_processing.compute_diff(b_result, c_result)
 
     # the function to give 3 pos
     answer = cluster.k_means(result_image, coord=coord)
     # end
+    result_image = cv2.circle(ima_cut, (x, y), 15, 255, 1)
+
+    result_image = cv2.rectangle(result_image, (x-30, y-30), (x+30, y+30), 255, 1)
+    print(np.shape(imb))
+    b_result = cv2.circle(b_result, (x, y), 15, 255, 1)
+    c_result = cv2.circle(c_result, (x, y), 15, 255, 1)
+    cv2.imshow('img_a', result_image)
+    cv2.imshow('img_b', b_result)
+    cv2.imshow('img_c', c_result)
+    cv2.waitKey(0)
+
 
     row = [image_name, answer[0, 0], answer[1, 0], answer[0, 1], answer[1, 1], answer[0, 2], answer[1, 2], 0]
-    csv_write.writerow(row)
+    # csv_write.writerow(row)
 
-    # break
+    break
 
 csv_file.close()
 
